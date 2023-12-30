@@ -1,11 +1,17 @@
 package springdatajpa.controllers;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springdatajpa.model.Delivery;
 import springdatajpa.model.Mobile;
+import springdatajpa.model.User;
+import springdatajpa.repositery.UserRepository;
 import springdatajpa.service.MobileService;
+import springdatajpa.service.UserService;
+
 import java.util.List;
 
 @RestController
@@ -15,6 +21,9 @@ public class MobileControllers {
 
     @Autowired
     MobileService mobileService;
+
+    @Autowired
+    UserService userService;
 
     @PostMapping("create")
     public ResponseEntity<Mobile> createMobile(@RequestBody Mobile mobile) {
@@ -29,7 +38,7 @@ public class MobileControllers {
     }
 
     @GetMapping(value = "getMobiles")
-    public ResponseEntity<List<Mobile>> getMobiles() {
+    public ResponseEntity<List<?>> getMobiles() {
         List<Mobile> mobiles = mobileService.getMobiles();
         if (mobiles != null) {
             return new ResponseEntity<>(mobiles, HttpStatus.OK);
@@ -45,8 +54,20 @@ public class MobileControllers {
     }
 
     @RequestMapping(value = "paginationWithSort/{pageNumber}/{pageSize}/{type}/{sortProperty}", method = RequestMethod.GET)
-    public ResponseEntity<Page<Mobile>> pagination(@PathVariable Integer pageNumber, @PathVariable Integer pageSize,@PathVariable String type, @PathVariable String sortProperty) {
-        Page<Mobile> mobiles = mobileService.getMobilePaginationWithSort(pageNumber, pageSize,type,sortProperty);
+    public ResponseEntity<Page<Mobile>> pagination(@PathVariable Integer pageNumber, @PathVariable Integer pageSize, @PathVariable String type, @PathVariable String sortProperty) {
+        Page<Mobile> mobiles = mobileService.getMobilePaginationWithSort(pageNumber, pageSize, type, sortProperty);
         return new ResponseEntity<>(mobiles, HttpStatus.OK);
     }
+
+    @GetMapping(value = "getMobilesByPin/{pin}")
+    public ResponseEntity<List<Delivery>> getMobilesByPin(@PathVariable Long pin) {
+        List<Delivery> mobiles = mobileService.getByDeliveryId(pin);
+        if (mobiles != null) {
+            return new ResponseEntity<>(mobiles, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+
 }
