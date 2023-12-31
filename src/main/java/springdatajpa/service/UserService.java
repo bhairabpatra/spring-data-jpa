@@ -1,13 +1,14 @@
 package springdatajpa.service;
 
+import springdatajpa.dto.UserDto;
 import springdatajpa.model.User;
 
 import java.util.List;
 
 public interface UserService {
-    User getUser(Long id);
+    UserDto getUser(Long id);
 
-    User createUser(User  user);
+    UserDto createUser(UserDto userDto);
 
     List<User> getUsers();
 }

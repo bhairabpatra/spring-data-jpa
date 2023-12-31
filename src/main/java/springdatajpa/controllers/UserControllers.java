@@ -4,9 +4,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springdatajpa.ErrorResponse.ErrorEntity;
 import springdatajpa.ErrorResponse.SuccessResponse;
+import springdatajpa.dto.UserDto;
 import springdatajpa.model.Mobile;
 import springdatajpa.model.User;
 import springdatajpa.service.MobileService;
@@ -29,28 +31,21 @@ public class UserControllers {
         this.mobileService = mobileService;
     }
     @PostMapping("create-user")
-    public ResponseEntity<?> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errors.put(error.getField(), error.getDefaultMessage()));
-            return new ResponseEntity<>(new ErrorEntity("Validation failed", errors), HttpStatus.BAD_REQUEST);
-        } else {
-            User newUser = userService.createUser(user);
+    public ResponseEntity<?> createUser(@RequestBody  @Valid UserDto userDto) {
+            UserDto newUser = userService.createUser(userDto);
             Map<String, String> success = new HashMap<>();
             success.put("message", "User created successfully");
             success.put("status", "201");
             return new ResponseEntity<>(new SuccessResponse("User created successfully", success, newUser), HttpStatus.CREATED);
-        }
     }
 
     @PostMapping("addUserToMobile/user/{userId}/mobiles/{mobileId}")
     public ResponseEntity<?> addUserToMobile(@PathVariable Long mobileId, @PathVariable Long userId) {
         Mobile mobile = mobileService.getMobile(mobileId);
-        User user = userService.getUser(userId);
-        if (mobile != null && user != null) {
-            user.getMobiles().add(mobile);
-            userService.createUser(user);
+        UserDto userDto = userService.getUser(userId);
+        if (mobile != null && userDto != null) {
+            userDto.getMobiles().add(mobile);
+            userService.createUser(userDto);
             return ResponseEntity.ok("Mobile assigned to the user successfully");
 //            System.out.println("user -> "+ user);
         } else {
@@ -68,3 +63,22 @@ public class UserControllers {
         }
     }
 }
+
+
+//    @PostMapping("create-user")
+//    public ResponseEntity<?> createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+//        if (bindingResult.hasErrors()) {
+//            Map<String, String> errors = new HashMap<>();
+//            bindingResult.getFieldErrors().forEach(error ->
+//                    errors.put(error.getField(), error.getDefaultMessage()));
+//            return new ResponseEntity<>(new ErrorEntity("Validation failed", errors), HttpStatus.BAD_REQUEST);
+//        } else {
+//            User newUser = userService.createUser(user);
+//            public ResponseEntity<?> createUser(@RequestBody  @Valid UserDto userDto) {
+//                UserDto newUser = userService.createUser(userDto);
+//                Map<String, String> success = new HashMap<>();
+//                success.put("message", "User created successfully");
+//                success.put("status", "201");
+//                return new ResponseEntity<>(new SuccessResponse("User created successfully", success, newUser), HttpStatus.CREATED);
+//            }
+//        }

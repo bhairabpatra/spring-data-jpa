@@ -23,6 +23,6 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         bindingResult.getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage()));
-        return new ResponseEntity<>(new ErrorEntity(ex.getMessage(), errors), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorEntity("Validation failed", errors), HttpStatus.BAD_REQUEST);
     }
 }
